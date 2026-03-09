@@ -1,14 +1,8 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createPost, getAllPosts } from "../../../data/posts";
 
-function requireAdmin() {
-  const cookieStore = cookies();
-  const session = cookieStore.get("admin_session");
-  if (!session || session.value !== "ok") {
-    throw new Error("unauthorized");
-  }
-}
+const USERNAME = "admin";
+const PASSWORD = "admin123";
 
 export async function GET() {
   const posts = await getAllPosts();
@@ -16,16 +10,16 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  try {
-    requireAdmin();
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { title, content } = (await request.json()) as {
+  const { title, content, username, password } = (await request.json()) as {
     title?: string;
     content?: string;
+    username?: string;
+    password?: string;
   };
+
+  if (username !== USERNAME || password !== PASSWORD) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   if (!title || !content) {
     return NextResponse.json(

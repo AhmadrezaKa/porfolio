@@ -10,24 +10,13 @@ export async function POST(request: Request) {
   };
 
   if (username !== USERNAME || password !== PASSWORD) {
-    return NextResponse.json({ ok: false, error: "Invalid credentials" }, { status: 401 });
+    return NextResponse.json(
+      { ok: false, error: "Invalid credentials" },
+      { status: 401 },
+    );
   }
 
-  const res = NextResponse.json({ ok: true });
-  res.headers.append(
-    "Set-Cookie",
-    [
-      `admin_session=ok`,
-      "Path=/",
-      "HttpOnly",
-      "SameSite=Lax",
-      process.env.NODE_ENV === "production" ? "Secure" : "",
-      "Max-Age=604800",
-    ]
-      .filter(Boolean)
-      .join("; "),
-  );
-
-  return res;
+  // No cookies; the admin UI just keeps a local "logged in" flag.
+  return NextResponse.json({ ok: true });
 }
 
